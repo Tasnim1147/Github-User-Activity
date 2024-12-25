@@ -6,7 +6,7 @@ from functools import lru_cache
 
 @lru_cache
 def get_acitivities(username: str) -> requests.Response:
-    return requests.get(f"https://api.github.com/user/{username}/events")
+    return requests.get(f"https://api.github.com/users/{username}/events")
 
 
 class Activity(object):
@@ -37,6 +37,7 @@ class Activity(object):
     def get_activities(self,
                        activity_types: list=[]
                        ) -> list[dict[str, Union[str, bool]]]:
+        if self.response.status_code != 200: return list()
         filtered_activities = filter(lambda activity: activity in activity_types,
                                      self.activities)
         activities = list(map(lambda activity: {
@@ -45,10 +46,11 @@ class Activity(object):
             'created_at': activity['created_at'],
             'public': activity['public'],
             'repo_name': activity['repo']['name']
-        }))
+        }), filtered_activities)
         return activities
 
     def get_types_of_events(self): 
+        if self.response.status_code != 200: return set()
         return set(map(lambda activity: activity['type'], self.activities))
 
     def get_needed_time(self) -> int: return self.needed_time
