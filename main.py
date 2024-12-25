@@ -26,7 +26,7 @@ class Github_Activity(cmd.Cmd):
     def precmd(self, 
                line: str
                ) -> str:
-        if (line != "help"):
+        if (line != "help" or line != "exit"):
             line = str(self.state) + line
         return super().precmd(line)
 
@@ -39,7 +39,6 @@ class Github_Activity(cmd.Cmd):
                 self.event_types = self.activity.get_types_of_events()
                 if (len(self.event_types) == 0):
                     print("No activities found")
-                    self.change_state()
                     return
                 print(f"Got event list in {self.activity.get_needed_time()} seconds\n")
                 self.prompt_event_types()
@@ -52,6 +51,7 @@ class Github_Activity(cmd.Cmd):
                  ) -> None: 
         if arg:
             try:
+                if choice == "exit": return self.do_exit()
                 choice = int(arg)
                 if (1 <= choice <= len(self.event_types)):
                     # Needs structured display
@@ -83,6 +83,11 @@ class Github_Activity(cmd.Cmd):
             print("<choice>")
         else:
             raise NotImplementedError
+        print("exit")
+
+    def do_exit(self, 
+                _) -> bool:
+        return True
         
     def change_state(self) -> None:
         if self.state == State.USERNAME:
