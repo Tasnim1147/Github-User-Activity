@@ -41,10 +41,11 @@ class Activity(object):
 
     def get_activities(self,
                        activity_types: list=[]
-                       ) -> list[dict[str, Union[str, bool]]]:
+                       ) -> list[dict[str, Union[str, bool]]]:        
         if self.response.status_code != 200: return list()
-        filtered_activities = filter(lambda activity: activity in activity_types,
+        filtered_activities = filter(lambda activity: activity['type'] in activity_types,
                                      self.activities)
+        
         activities = list(map(lambda activity: {
             'type': activity['type'],
             'id': activity['id'],
