@@ -1,12 +1,17 @@
 from typing import Union
-import requests, json, time
+import requests, json, time, os
 
 from functools import lru_cache
 
 
 @lru_cache
 def get_acitivities(username: str) -> requests.Response:
-    return requests.get(f"https://api.github.com/users/{username}/events")
+    token = os.getenv("GITHUB_TOKEN")
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    return requests.get(f"https://api.github.com/users/{username}/events",
+                        headers=headers)
 
 
 class Activity(object):
@@ -46,11 +51,12 @@ class Activity(object):
             'created_at': activity['created_at'],
             'public': activity['public'],
             'repo_name': activity['repo']['name']
-        }), filtered_activities)
+        }, filtered_activities))
         return activities
 
     def get_types_of_events(self) -> list[str]: 
-        if self.response.status_code != 200: return list[]
-        return list(set(map(lambda activity: activity['type'], self.activities)))
+        if self.response.status_code != 200: return list()
+        event_types = list(set(map(lambda activity: activity['type'], self.activities)))
+        return event_types
 
     def get_needed_time(self) -> int: return self.needed_time
