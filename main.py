@@ -26,7 +26,8 @@ class Github_Activity(cmd.Cmd):
     def precmd(self, 
                line: str
                ) -> str:
-        line = str(self.state) + line
+        if (line != "help"):
+            line = str(self.state) + line
         return super().precmd(line)
 
     def do_username(self, 
@@ -72,6 +73,13 @@ class Github_Activity(cmd.Cmd):
         print(f"{len(self.event_types) + 1}. All")
         print(f"-1. None")
 
+    def do_help(self, arg):
+        if self.state == State.USERNAME:
+            print("<username>")
+        elif self.state == State.EVENT:
+            print("<choice>")
+        else:
+            raise NotImplementedError
 
 if __name__ == "__main__":
     github_activity = Github_Activity()
