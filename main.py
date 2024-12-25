@@ -9,6 +9,39 @@ class State(enum.Enum):
     def __str__(self):
         return self.value
 
+def display_activities(activities: list[dict[str, str]]) -> None:
+
+    headers = list(activities[0].keys())
+    rows = [list(activity.values()) for activity in activities]
+    max_column_widths = [max([len(str(row[idx])) for row in rows] + [len(headers[idx])]) for idx in range(len(headers))]
+    table_width = sum(max_column_widths) + 4 * len(headers)
+    
+    def display_border(edge='+') -> None: print(f"{edge}{'-'*table_width}{edge}")
+
+    def display_row(row) -> None: 
+        nonlocal max_column_widths
+        for idx, cell in enumerate(row):
+            print(f"| {' ' * (max_column_widths[idx] - len(str(cell)))} {cell}", end=" ")
+        print(" |")
+        
+
+    display_border()
+    def display_headers() -> None: 
+        nonlocal headers
+        display_row(headers)
+        display_border()
+        
+    def display_rows(row: list[any]) -> None: 
+        nonlocal rows
+        n = len(rows)
+        for idx, row in enumerate(rows):
+            display_row(row)  
+            if idx != n - 1: display_border(edge='-')
+
+    display_headers()
+    display_rows(rows)
+    if rows: display_border()
+    
 
 class Github_Activity(cmd.Cmd):
 
@@ -53,11 +86,9 @@ class Github_Activity(cmd.Cmd):
             try:
                 choice = int(arg)
                 if (1 <= choice <= len(self.event_types)):
-                    # Needs structured display
-                    print(self.activity.get_activities([self.event_types[choice - 1]]))
+                    display_activities(self.activity.get_activities([self.event_types[choice - 1]]))
                 elif (choice == len(self.event_types) + 1):
-                    # Needs structured display
-                    print(self.activity.get_activities(self.event_types))
+                    display_activities(self.activity.get_activities(self.event_types))
                 else:
                     raise IndexError
             except ValueError:
