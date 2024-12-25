@@ -17,7 +17,7 @@ class Github_Activity(cmd.Cmd):
         self.state = State.USERNAME
         self.activity = []
         self.event_types = []
-        super().__init__(completekey='tab', 
+        super().__init__(completekey=None, 
                          stdin=None, 
                          stdout=None)
 
@@ -35,11 +35,15 @@ class Github_Activity(cmd.Cmd):
                     ) -> None: 
         if arg:
             self.activity = Activity(arg)
-            if (self.activity.is_valid_response):
-                self.state = State.EVENT
-                print(f"Got event list in {self.activity.get_needed_time() / 1000} seconds\n")
-                self.prompt_event_types()
+            if (self.activity.is_valid_response()):
                 self.event_types = self.activity.get_types_of_events()
+                if (len(self.event_types) == 0):
+                    print("No activities found")
+                    self.change_state()
+                    return
+                print(f"Got event list in {self.activity.get_needed_time()} seconds\n")
+                self.prompt_event_types()
+                self.change_state()
             else:
                 print(f"Provided username ({arg}) is invalid or the server is down")
 
@@ -48,8 +52,6 @@ class Github_Activity(cmd.Cmd):
                  ) -> None: 
         if arg:
             try:
-                if arg == None: 
-                    self.state = State.USERNAME
                 choice = int(arg)
                 if (1 <= choice <= len(self.event_types)):
                     # Needs structured display
@@ -64,6 +66,8 @@ class Github_Activity(cmd.Cmd):
                 self.prompt_event_types()
             except IndexError:
                 print(f"Provided choice is out of range: {arg}")
+        else:
+            self.change_state()
 
 
     def prompt_event_types(self) -> None:
@@ -71,7 +75,6 @@ class Github_Activity(cmd.Cmd):
         for i, choice in enumerate(self.event_types, start=1):
             print(f"{i}. {choice}")
         print(f"{len(self.event_types) + 1}. All")
-        print(f"-1. None")
 
     def do_help(self, arg):
         if self.state == State.USERNAME:
@@ -80,6 +83,14 @@ class Github_Activity(cmd.Cmd):
             print("<choice>")
         else:
             raise NotImplementedError
+        
+    def change_state(self) -> None:
+        if self.state == State.USERNAME:
+            self.state = State.EVENT
+            self.prompt = "choice: "
+        elif self.state == State.EVENT:
+            self.state = State.USERNAME
+            self.prompt = "github-activity "
 
 if __name__ == "__main__":
     github_activity = Github_Activity()
