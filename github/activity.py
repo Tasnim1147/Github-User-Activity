@@ -24,7 +24,7 @@ class Activity(object):
     def _process_events(self): 
         start_time = time.time()
         self.response = get_acitivities(self.username)
-        self.activities = json.loads(self.response)
+        self.activities = json.loads(self.response.content)
         end_time = time.time()
         self.needed_time = end_time - start_time
 
