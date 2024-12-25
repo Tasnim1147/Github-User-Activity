@@ -26,7 +26,7 @@ class Github_Activity(cmd.Cmd):
     def precmd(self, 
                line: str
                ) -> str:
-        if (line != "help" or line != "exit"):
+        if (line != "help" and line != "exit"):
             line = str(self.state) + line
         return super().precmd(line)
 
@@ -51,7 +51,6 @@ class Github_Activity(cmd.Cmd):
                  ) -> None: 
         if arg:
             try:
-                if choice == "exit": return self.do_exit()
                 choice = int(arg)
                 if (1 <= choice <= len(self.event_types)):
                     # Needs structured display
