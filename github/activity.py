@@ -28,7 +28,10 @@ class Activity(object):
         end_time = time.time()
         self.needed_time = end_time - start_time
 
-    def is_valid_response(self): 
+    def is_valid_response(self) -> int: 
+        return self.response.status_code == 200
+    
+    def get_response_status(self) -> int:
         return self.response.status_code
 
     def get_activities(self,
