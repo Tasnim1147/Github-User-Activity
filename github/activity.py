@@ -49,8 +49,8 @@ class Activity(object):
         }), filtered_activities)
         return activities
 
-    def get_types_of_events(self): 
-        if self.response.status_code != 200: return set()
-        return set(map(lambda activity: activity['type'], self.activities))
+    def get_types_of_events(self) -> list[str]: 
+        if self.response.status_code != 200: return list[]
+        return list(set(map(lambda activity: activity['type'], self.activities)))
 
     def get_needed_time(self) -> int: return self.needed_time
